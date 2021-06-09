@@ -10,8 +10,31 @@ module.exports = {
                 "env": "development" // 개발환경시 적용될 설정 지정
             },
             env_production: {
-                "env": "production" // 배포환경시 적용될 설정 지정
+                "env": "production", // 배포환경시 적용될 설정 지정,
+                "NODE_ENV": "production",
+
+
+                "PORT": 8081,
+                "HOST": "localhost",
+
+
+                "JET_LOGGER_MODE": "FILE",
+                "JET_LOGGER_FILEPATH": "jet-logger.log",
+                "JET_LOGGER_TIMESTAMP": "TRUE",
+                "JET_LOGGER_FORMAT": "LINE",
+
+                "COOKIE_DOMAIN": "localhost",
+                "COOKIE_PATH": "/",
+                "SECURE_COOKIE": "false",
+                "JWT_SECRET": "xxxxxxxxxxxxxx",
+                "COOKIE_SECRET": "xxxxxxxxxxxxxx",
+                "COOKIE_EXP": 259200000,
+
+
+                "HOST_EMAIL": "wo7864@gmail.com",
+                "HOST_EMAIL_PW": "3kat59!@",
+
             }
         }
     ]
-};
+}
