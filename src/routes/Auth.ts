@@ -122,7 +122,7 @@ export async function logout(req: Request, res: Response) {
 export async function sendAuthEmail(req: Request, res: Response) {
     const { id, email } = req.body;
     const transporter = nodemailer.createTransport({
-        port: 587,               // true for 465, false for other ports
+        port: 465,               // true for 465, false for other ports
         host: "smtp.gmail.com",
         service: 'gmail',
         secure: false, // true for 587, false for other ports

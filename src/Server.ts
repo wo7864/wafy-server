@@ -25,6 +25,8 @@ app.use('/static', express.static('public'));
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(cookieParser(cookieProps.secret));
+
+
 // Show routes called in console during development
 if (process.env.NODE_ENV === 'development') {
     app.use(cors({
