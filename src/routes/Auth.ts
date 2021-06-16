@@ -169,8 +169,6 @@ export async function sendAuthEmail(req: Request, res: Response) {
         from: process.env.HOST_EMAIL,
         to: email
     });
-
-
 }
 export async function emailAuth(req: Request, res: Response) {
     const { id, token } = req.params;

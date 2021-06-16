@@ -16,6 +16,9 @@ declare module 'express' {
         };
 
     }
+    export interface Response{
+        cookie:any
+    }
 }
 
 
