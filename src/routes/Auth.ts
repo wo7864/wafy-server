@@ -145,7 +145,7 @@ export async function sendAuthEmail(req: Request, res: Response) {
         })
 
 
-    const authURL = `http://localhost:3000/api/auth/email-auth/${id}/${token}`;
+    const authURL = `http://${process.env.HOST}/api/auth/email-auth/${id}/${token}`;
     const html =
         `
     <h1 style="border-bottom:1px solid #000">가입을 환영합니다!</h1>

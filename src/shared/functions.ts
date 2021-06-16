@@ -79,7 +79,6 @@ export function comparePassword(password: string, pwdHash:string, salt:string):P
     return new Promise<boolean>(async (resolve, reject) => {
         crypto.pbkdf2(password, salt, 9999, 64, 'sha512', (err, key) => {
             if (err) reject(err);
-            console.log(key.toString('base64'), password, pwdHash, salt);
             resolve(key.toString('base64') === pwdHash);
         });
     });

@@ -166,7 +166,6 @@ export async function downloadProject(req: Request, res: Response) {
       }
       
       const project = user.projects.id(project_key);
-      console.log('hi')
       converter(project);
       //const {html, css, js} = converter(project.data);
     })
