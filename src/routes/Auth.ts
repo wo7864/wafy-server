@@ -7,7 +7,8 @@ import {
     paramMissingError,
     loginFailedErr,
     cookieProps,
-    notFoundError
+    notFoundError,
+    cookieNotFoundError
 } from '@shared/constants';
 import User from '../models/User'
 import { comparePassword, getUuid } from '@shared/functions';
@@ -17,9 +18,49 @@ const {
     BAD_REQUEST,
     OK,
     UNAUTHORIZED,
-    CREATED,
-    CONFLICT,
 } = StatusCodes;
+
+
+export async function authUser(req: Request, res: Response) {
+    if (!req.cookies) {
+        return res.status(BAD_REQUEST).json({
+            error: cookieNotFoundError
+        })
+    }
+    const token = req.cookies.wafy;
+    const guestUser = {
+        user: { id: 'guest' }
+    }
+    if (!token) {
+        return res.status(OK).json(guestUser)
+    }
+
+    const { id } = await jwtService.decodeJwt(token);
+
+    if (!id) {
+        return res.status(OK).json(guestUser)
+    }
+
+    await User.findById(id)
+        .then((user: any) => {
+            const projects = user.projects.map((project: any) => {
+                return {
+                    id: project._id,
+                    title: project.title,
+                    thumbnail: project.thumbnail,
+                    update_date: project.update_date
+                }
+            })
+            return res.status(OK).json({
+                user: {
+                    id: user.id,
+                    email: user.email,
+                    projects: projects
+                }
+            })
+        })
+        .catch(e => res.status(BAD_REQUEST).json(e))
+}
 
 export async function login(req: Request, res: Response) {
     // Check email and password present
@@ -45,15 +86,34 @@ export async function login(req: Request, res: Response) {
         });
     }
     // Setup Admin Cookie
-    const jwt = await jwtService.getJwt({ email: email });
+    const jwt = await jwtService.getJwt({
+        id: user.id
+    });
     const { key, options } = cookieProps;
     res.cookie(key, jwt, options);
     // Return
-    return res.status(OK).end();
+
+
+    const projects = user.projects.map((project: any) => {
+        return {
+            id: project._id,
+            title: project.title,
+            thumbnail: project.thumbnail,
+            update_date: project.update_date
+        }
+    })
+
+    return res.status(OK).json({
+        user: {
+            id: user.id,
+            email: user.email,
+            isAuthEmail:user.isAuthEmail,
+            projects: projects
+        }
+    })
 }
 
 export async function logout(req: Request, res: Response) {
-    console.log(res);
     const { key, options } = cookieProps;
     res.clearCookie(key, options);
     return res.status(OK).end();
@@ -62,14 +122,17 @@ export async function logout(req: Request, res: Response) {
 export async function sendAuthEmail(req: Request, res: Response) {
     const { id, email } = req.body;
     const transporter = nodemailer.createTransport({
-        port: 465,               // true for 465, false for other ports
+        port: 587,               // true for 465, false for other ports
         host: "smtp.gmail.com",
         service: 'gmail',
+        secure: false, // true for 587, false for other ports
+        requireTLS: true,
         auth: {
             user: process.env.HOST_EMAIL,
             pass: process.env.HOST_EMAIL_PW,
         },
     });
+
 
     const token = getUuid()
     await User.findById(id)
@@ -77,7 +140,9 @@ export async function sendAuthEmail(req: Request, res: Response) {
             user.authEmailToken = token;
             user.save();
         })
-        .catch(e => res.status(BAD_REQUEST).send(e))
+        .catch(e => {
+            return res.status(BAD_REQUEST).json(e)
+        })
 
 
     const authURL = `http://localhost:3000/api/auth/email-auth/${id}/${token}`;
@@ -94,13 +159,17 @@ export async function sendAuthEmail(req: Request, res: Response) {
         html: html,
 
     };
-
     transporter.sendMail(mailData, (error, info) => {
         if (error) {
-            return console.error(error);
+            return res.status(BAD_REQUEST).json(error);
         }
-        return res.status(OK).send({ message: "Mail send", message_id: info.messageId });
     })
+    return res.status(OK).json({
+        message: "Mail send",
+        from: process.env.HOST_EMAIL,
+        to: email
+    });
+
 
 }
 export async function emailAuth(req: Request, res: Response) {

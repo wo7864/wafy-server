@@ -6,8 +6,7 @@ import { cookieProps } from '@shared/constants';
 
 
 export interface IClientData {
-    email: string;
-    id?:string;
+    id:string;
 }
 
 interface IOptions {

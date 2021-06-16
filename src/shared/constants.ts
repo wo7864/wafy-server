@@ -5,6 +5,7 @@ export const loginFailedErr = 'Login failed';
 export const emailConflictError = 'This email already exists';
 export const notFoundError = 'Not found error';
 export const meximumExceededError = 'The maximum size of the array has been exceeded';
+export const cookieNotFoundError = 'Cookie not found';
 
 // Numbers
 export const pwdSaltRounds = 12;
@@ -15,7 +16,7 @@ export const cookieProps = Object.freeze({
     secret: process.env.COOKIE_SECRET,
     options: {
         httpOnly: true,
-        signed: true,
+        signed: false,
         path: (process.env.COOKIE_PATH),
         maxAge: Number(process.env.COOKIE_EXP),
         domain: (process.env.COOKIE_DOMAIN),

@@ -6,6 +6,7 @@ import {
     logout,
     emailAuth,
     sendAuthEmail,
+    authUser,
 } from './Auth';
 
 import {
@@ -195,6 +196,7 @@ assetVideoRouter.get('/split/:id/:project_key/:filename', splitAssetVideo);
 *                   인증 관련 라우팅                    *
 *                   [url]/api/auth/                    *
 ********************************************************/
+authRouter.get('/user', authUser);
 authRouter.post('/login', login);
 authRouter.get('/logout', logout);
 authRouter.post('/email-auth', sendAuthEmail);

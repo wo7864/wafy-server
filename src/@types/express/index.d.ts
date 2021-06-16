@@ -7,7 +7,7 @@ declare module 'express' {
     export interface Request  {
         body: {
             id:string;
-            user: IUser
+            user: any
             email: string;
             password: string;
             project:String;

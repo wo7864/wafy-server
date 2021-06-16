@@ -1,4 +1,5 @@
 import cookieParser from 'cookie-parser';
+import cors from 'cors';
 import morgan from 'morgan';
 import path from 'path';
 import helmet from 'helmet';
@@ -20,21 +21,33 @@ const { BAD_REQUEST } = StatusCodes;
 /************************************************************************************
  *                              Set basic express settings
  ***********************************************************************************/
-
+app.use('/static', express.static('public'));
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(cookieParser(cookieProps.secret));
-
 // Show routes called in console during development
 if (process.env.NODE_ENV === 'development') {
+    app.use(cors({
+        origin: "http://localhost:3000",
+        credentials: true
+    }));
     app.use(morgan('dev'));
     connect();
+
 }
 
 // Security
 if (process.env.NODE_ENV === 'production') {
+    app.use(cors({
+        origin: [
+            "https://wafy.vercel.app",
+            "https://localhost:3000",
+        ],
+        credentials: true
+    }));
     app.use(helmet());
     connect();
+
 }
 // 리스너 제한 수정 
 process.setMaxListeners(15);

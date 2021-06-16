@@ -38,14 +38,14 @@ export async function getUser(req: Request, res: Response) {
 
 export async function addUser(req: Request, res: Response) {
 
-    const { user } = req.body;
-    if (!user) {
+    const { email, password } = req.body;
+    if (!(email)) {
         return res.status(BAD_REQUEST).json({
             error: paramMissingError,
         });
     }
 
-    await User.findOne({ email: user.email })
+    await User.findOne({ email: email })
         .then((duplicateUser: any) => {
             if (duplicateUser !== null) {
                 return res.status(CONFLICT).json({
@@ -54,12 +54,22 @@ export async function addUser(req: Request, res: Response) {
             }
         })
 
+    const user: any = {
+        email: email,
+    };
+    if (password) {
+        const { salt, pwdHash } = await hashPassword(password);
+        user.pwdHash = pwdHash;
+        user.salt = salt;
+    }
+
+
     const user_ = new User(user)
     user_.save(function (err, user) {
         if (err) return console.error(err);
-    });
+        else return res.status(CREATED).json(user);
+    })
 
-    return res.status(CREATED).end();
 
 }
 
@@ -108,7 +118,7 @@ export async function setPassword(req: Request, res: Response) {
 
     await User.findById(id)
         .then(async (user: any) => {
-            const {salt , pwdHash} = await hashPassword(password);
+            const { salt, pwdHash } = await hashPassword(password);
             user.pwdHash = pwdHash;
             user.salt = salt;
             user.save()
