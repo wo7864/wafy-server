@@ -1,5 +1,5 @@
 import './pre-start'; // Must be the first import
-//import 'module-alias/register';
+import 'module-alias/register';
 import app from '@server';
 import logger from '@shared/Logger';
 
