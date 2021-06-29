@@ -48,13 +48,16 @@ export async function authUser(req: Request, res: Response) {
                     id: project._id,
                     title: project.title,
                     thumbnail: project.thumbnail,
-                    update_date: project.update_date
+                    createdAt: project.createdAt,
+                    updatedAt: project.updatedAt
                 }
             })
             return res.status(OK).json({
                 user: {
                     id: user.id,
                     email: user.email,
+                    createdAt: user.createdAt,
+                    updatedAt: user.updatedAt,
                     projects: projects
                 }
             })
@@ -93,7 +96,7 @@ export async function login(req: Request, res: Response) {
     res.cookie(key, jwt, options);
     // Return
 
-
+    console.log(jwt)
     const projects = user.projects.map((project: any) => {
         return {
             id: project._id,

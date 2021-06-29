@@ -30,7 +30,10 @@ app.use(cookieParser(cookieProps.secret));
 // Show routes called in console during development
 if (process.env.NODE_ENV === 'development') {
     app.use(cors({
-        origin: "http://localhost:3000",
+        origin: [
+            "http://localhost:3000",
+            "http://localhost:3100",
+        ],
         credentials: true
     }));
     app.use(morgan('dev'));
@@ -44,6 +47,7 @@ if (process.env.NODE_ENV === 'production') {
     app.use(cors({
         origin: [
             "https://wafy.vercel.app",
+            "https://wafy-editor.vercel.app",
             "http://localhost:3000",
         ],
         credentials: true

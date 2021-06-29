@@ -4,6 +4,7 @@ import {
     object,
 } from "serializr";
 export interface IAnimation{
+    type:String,
     name:String,
     target:string;
     duration?:Number;
@@ -41,6 +42,7 @@ export interface IAnimationList{
 }
 
 const animationSchema = new Schema({
+    type:String,
     name:String,
     target:String,
     duration:Number,
@@ -80,6 +82,9 @@ export const animationListSchema = new Schema({
 class Animation implements IAnimation{
 
     [key:string]:any
+    @serializable
+    type:string;
+
     @serializable
     name:string;
 
@@ -132,6 +137,7 @@ class Animation implements IAnimation{
     end?:Number;
 
     constructor(){
+        this.type = '';
         this.name = '';
         this.target = 'self';
 

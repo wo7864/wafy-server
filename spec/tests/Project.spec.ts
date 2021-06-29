@@ -23,10 +23,10 @@ describe('ProjectRouter', () => {
     const usersPath = '/api/users/:id';
     const projectsPath = `${usersPath}/projects`;
     const getAllProjectsPath = `${projectsPath}`;
-    const getProjectsPath = `${projectsPath}/:project_key`;
+    const getProjectsPath = `${projectsPath}/:project_id`;
     const createProjectsPath = `${projectsPath}`;
-    const updateProjectPath = `${projectsPath}/:project_key`;
-    const deleteProjectPath = `${projectsPath}/:project_key`;
+    const updateProjectPath = `${projectsPath}/:project_id`;
+    const deleteProjectPath = `${projectsPath}/:project_id`;
 
     let agent: SuperTest<Test>;
 

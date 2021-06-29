@@ -25,7 +25,9 @@ import {
     updateProject,
     deleteProject,
     downloadProject,
-
+    getSimpleProjects,
+    createTemplateProject,
+    saveProject,
 } from './Projects';
 
 import {
@@ -153,33 +155,37 @@ assetRouter.use('/videos', assetVideoRouter);
 *                   [url]/api/users/                    *
 ********************************************************/
 
+userRouter.patch('/password/:id', setPassword);
 userRouter.get('/', getAllUsers);
 userRouter.get('/:id', getUser);
 userRouter.post('/', addUser);
 userRouter.patch('/:id', updateUser);
 userRouter.delete('/:id', deleteUser);
-userRouter.patch('/password/:id', setPassword);
 
 /*******************************************************
 *                   프로젝트 관련 라우팅                 *
 *                   [url]/api/users/projects           *
 ********************************************************/
+projectRouter.get('/simple/:id', getSimpleProjects);
+projectRouter.get('/download/:id/:project_id', downloadProject);
+projectRouter.post('/template/:id/:template_oid/:project_id', createTemplateProject);
+projectRouter.patch('/save/:id/:project_id', saveProject);
 projectRouter.get('/:id', getAllProjects);
-projectRouter.get('/:id/:project_key', getProject);
+projectRouter.get('/:id/:project_id', getProject);
 projectRouter.post('/:id', createProject);
-projectRouter.patch('/:id/:project_key', updateProject);
-projectRouter.delete('/:id/:project_key', deleteProject);
+projectRouter.patch('/:id/:project_id', updateProject);
+projectRouter.delete('/:id/:project_id', deleteProject);
 
-projectRouter.get('/download/:id/:project_key', downloadProject);
+
 
 /********************************************************************
 *                   프로젝트 Assets Image 관련 라우팅                 *
 *                   [url]/api/users/projects/assets/images          *
 *********************************************************************/
 
-assetImageRouter.get('/:id/:project_key', getAllAssetImages);
-assetImageRouter.post('/:id/:project_key', imagesUpload.array('image'), addAssetImage);
-assetImageRouter.delete('/:id/:project_key/:filename', deleteAssetImage);
+assetImageRouter.get('/:id/:project_id', getAllAssetImages);
+assetImageRouter.post('/:id/:project_id', imagesUpload.array('image'), addAssetImage);
+assetImageRouter.delete('/:id/:project_id/:filename', deleteAssetImage);
 
 
 /********************************************************************
@@ -187,10 +193,10 @@ assetImageRouter.delete('/:id/:project_key/:filename', deleteAssetImage);
 *                   [url]/api/users/projects/assets/videos          *
 *********************************************************************/
 
-assetVideoRouter.get('/:id/:project_key', getAllAssetVideos);
-assetVideoRouter.post('/:id/:project_key', videosUpload.array('video'), addAssetVideos);
-assetVideoRouter.delete('/:id/:project_key/:filename', deleteAssetVideos);
-assetVideoRouter.get('/split/:id/:project_key/:filename', splitAssetVideo);
+assetVideoRouter.get('/split/:id/:project_id/:filename', splitAssetVideo);
+assetVideoRouter.get('/:id/:project_id', getAllAssetVideos);
+assetVideoRouter.post('/:id/:project_id', videosUpload.array('video'), addAssetVideos);
+assetVideoRouter.delete('/:id/:project_id/:filename', deleteAssetVideos);
 
 /*******************************************************
 *                   인증 관련 라우팅                    *

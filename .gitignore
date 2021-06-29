@@ -39,3 +39,9 @@ dist/**/*
 
 # ignore yarn.lock
 yarn.lock
+
+# ignore package-lock.json
+package-lock.json
+
+src/public/assets/
+src/public/projects/

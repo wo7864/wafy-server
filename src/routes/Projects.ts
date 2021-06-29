@@ -1,5 +1,7 @@
 import StatusCodes from 'http-status-codes';
-import { Request, Response, Router } from 'express';
+import { Request, Response } from 'express';
+import mongoose from 'mongoose';
+
 import {
   paramMissingError,
   notFoundError,
@@ -7,7 +9,7 @@ import {
 } from '@shared/constants';
 import { converter } from '@shared/converter'
 import User, { IUser } from '../models/User'
-import Project from '../models/Project'
+import Project, { ISimpleProject } from '../models/Project'
 
 const {
   BAD_REQUEST,
@@ -27,17 +29,16 @@ export async function getAllProjects(req: Request, res: Response) {
   }
 
   await User.findById(id)
-    .then((user:any) => {
+    .then((user: any) => {
       return res.status(OK).send(user.projects)
     })
     .catch(e => res.status(BAD_REQUEST).send(e))
 }
 
-export async function getProject(req: Request, res: Response) {
 
-
-  const { id, project_key } = req.params;
-  if (!(id && project_key)) {
+export async function getSimpleProjects(req: Request, res: Response) {
+  const { id } = req.params;
+  if (!id) {
     return res.status(BAD_REQUEST).json({
       error: paramMissingError,
     });
@@ -45,7 +46,36 @@ export async function getProject(req: Request, res: Response) {
 
   await User.findById(id)
     .then((user: any) => {
-      return res.status(OK).send(user.projects.id(project_key))
+      const projects = user.projects.map((project: ISimpleProject) => {
+        return {
+          _id: project._id,
+          title: project.title,
+          thumbnail: project.thumbnail,
+          create_date: project.create_date,
+          update_date: project.update_date,
+        }
+      })
+      return res.status(OK).json(projects)
+    })
+    .catch(e => res.status(BAD_REQUEST).send(e))
+}
+
+
+export async function getProject(req: Request, res: Response) {
+  const { id, project_id } = req.params;
+  if (!(id && project_id)) {
+    return res.status(BAD_REQUEST).json({
+      error: paramMissingError,
+    });
+  }
+
+  await User.findById(id)
+    .then((user: any) => {
+      const project = user.projects.id(project_id);
+      if (!project) return res.status(NOT_FOUND).json({
+        error: notFoundError
+      })
+      return res.status(OK).json(project)
     })
     .catch(e => res.status(BAD_REQUEST).send(e))
 
@@ -96,16 +126,16 @@ export async function createProject(req: Request, res: Response) {
 * @returns 
 */
 export async function updateProject(req: Request, res: Response) {
-  const { id, project_key } = req.params;
+  const { id, project_id } = req.params;
   const { project } = req.body;
-  if (!(id && project_key && project)) {
+  if (!(id && project_id && project)) {
     return res.status(BAD_REQUEST).json({
       error: paramMissingError,
     });
   }
   await User.findById(id)
     .then((user: any) => {
-      const originProject = user.projects.id(project_key);
+      const originProject = user.projects.id(project_id);
       originProject.set(project)
       return user.save()
     })
@@ -118,6 +148,7 @@ export async function updateProject(req: Request, res: Response) {
 }
 
 
+
 /**
 * Delete one project.
 * 
@@ -126,10 +157,10 @@ export async function updateProject(req: Request, res: Response) {
 * @returns 
 */
 export async function deleteProject(req: Request, res: Response) {
-  const { id, project_key } = req.params;
+  const { id, project_id } = req.params;
   const { project } = req.body;
 
-  if (!(project && id && project_key)) {
+  if (!(project && id && project_id)) {
     return res.status(BAD_REQUEST).json({
       error: paramMissingError,
     });
@@ -137,7 +168,7 @@ export async function deleteProject(req: Request, res: Response) {
 
   await User.findById(id)
     .then((user: any) => {
-      user.projects.id(project_key).remove();
+      user.projects.id(project_id).remove();
       return user.save()
     })
     .then((user) => {
@@ -150,8 +181,8 @@ export async function deleteProject(req: Request, res: Response) {
 
 
 export async function downloadProject(req: Request, res: Response) {
-  const { id, project_key } = req.params;
-  if (!(id && project_key)) {
+  const { id, project_id } = req.params;
+  if (!(id && project_id)) {
     return res.status(BAD_REQUEST).json({
       error: paramMissingError,
     });
@@ -164,8 +195,8 @@ export async function downloadProject(req: Request, res: Response) {
           error: notFoundError,
         })
       }
-      
-      const project = user.projects.id(project_key);
+
+      const project = user.projects.id(project_id);
       converter(project);
       //const {html, css, js} = converter(project.data);
     })
@@ -178,4 +209,64 @@ export async function downloadProject(req: Request, res: Response) {
     }))
 
   //return res.status(OK).end();
+}
+
+
+export async function createTemplateProject(req: Request, res: Response) {
+  const { id, template_oid, project_id } = req.params;
+
+  if (!(id && template_oid && project_id)) {
+    return res.status(BAD_REQUEST).json({
+      error: paramMissingError,
+    });
+  }
+
+  const template = await User.findById(template_oid)
+    .then((user: any) => {
+      return user.projects.id(project_id)
+    })
+
+  await User.findById(id)
+    .then((user: any) => {
+      const newOid = new mongoose.Types.ObjectId();
+      template._id = newOid
+      template.createdAt = Date.now();
+      template.updatedAt = Date.now();
+      user.projects.push(template)
+      user.save()
+      return res.status(CREATED).send({ project_id:newOid })
+    })
+    .catch(e => res.status(BAD_REQUEST).send(e))
+
+}
+
+
+export async function saveProject(req: Request, res: Response) {
+  const { id, project_id } = req.params;
+  const { data } = req.body;
+  if (!(id && project_id && data)) {
+    return res.status(BAD_REQUEST).json({
+      error: paramMissingError,
+    });
+  }
+
+  await User.findById(id)
+    .then((user: any) => {
+      const originProject = user.projects.id(project_id);
+      const json_data = JSON.parse(data)
+      originProject.set({
+        ...originProject,
+        data:json_data
+      })
+      return user.save()
+    })
+    .then((user) => {
+      return res.status(OK).send({ user })
+    })
+    .catch(e => {
+      console.log(e);
+      return res.status(BAD_REQUEST).send(e)
+    })
+
+  return;
 }

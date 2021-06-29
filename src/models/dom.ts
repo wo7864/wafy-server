@@ -13,8 +13,8 @@ export interface IDom{
 
     style:IStyle;
     animation:AnimationList;
-
-
+    
+    
     tag:string;
     children:Array<Dom>;
     id:string;
@@ -31,12 +31,17 @@ export interface IDom{
 
 
 export const domSchema = new Schema({
+    style:styleSchema,
+    animation:animationListSchema,
+
     tag:String,
     id:String,
     className:[String],
     innerText:String,
-    style:styleSchema,
-    animation:animationListSchema,
+    rel:String,
+    type:String,
+    href:String,
+    src:String,
 })
 domSchema.add({
     children:[domSchema],

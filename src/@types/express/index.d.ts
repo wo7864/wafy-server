@@ -13,6 +13,7 @@ declare module 'express' {
             project:String;
             template: String;
             image:any;
+            data:string;
         };
 
     }
