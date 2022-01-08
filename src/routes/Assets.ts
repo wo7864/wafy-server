@@ -1,12 +1,10 @@
 import fs from 'fs';
-import * as cv from 'opencv4nodejs'
 import StatusCodes from 'http-status-codes';
 import { Request, Response, } from 'express';
 import {
   paramMissingError,
   notFoundError,
 } from '@shared/constants';
-
 
 import User from '../models/User'
 
@@ -108,11 +106,11 @@ export async function addAssetVideos(req: Request, res: Response) {
     fs.mkdirSync(videoOutputPath)
   }
 
-  const cap = new cv.VideoCapture(videoPath);
+  const cap = new VideoCapture(videoPath);
 
   let frame;
   frame = cap.read();
-  cv.imwrite(`${videoOutputPath}/${videos[0].filename.split('.')[0]}.jpg`, frame);
+  imwrite(`${videoOutputPath}/${videos[0].filename.split('.')[0]}.jpg`, frame);
 
 
 
@@ -181,13 +179,13 @@ export async function splitAssetVideo(req: Request, res: Response) {
     })
   }
 
-  const cap = new cv.VideoCapture(videoPath);
+  const cap = new VideoCapture(videoPath);
 
   let cnt = 0;
   let frame;
   frame = cap.read();
   while (frame.step) {
-    cv.imwrite(`${videoOutputPath}/${cnt}.jpg`, frame);
+    imwrite(`${videoOutputPath}/${cnt}.jpg`, frame);
     frame = cap.read();
     cnt += 1
   }

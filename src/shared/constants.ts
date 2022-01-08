@@ -21,6 +21,5 @@ export const cookieProps = Object.freeze({
         maxAge: Number(process.env.COOKIE_EXP),
         domain: (process.env.COOKIE_DOMAIN),
         secure: (process.env.SECURE_COOKIE === 'true'),
-        sameSite:'None'
     },
 });
